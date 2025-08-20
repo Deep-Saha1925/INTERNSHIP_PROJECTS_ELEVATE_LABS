@@ -31,4 +31,9 @@ public class UrlController {
                 .location(URI.create(originalUrl))
                 .build();
     }
+
+    @GetMapping("/{shortUrl}/stats")
+    public int getClickStats(@PathVariable String shortUrl) {
+        return service.getClickCount(shortUrl);
+    }
 }

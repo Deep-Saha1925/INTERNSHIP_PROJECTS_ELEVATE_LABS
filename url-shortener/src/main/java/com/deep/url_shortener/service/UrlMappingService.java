@@ -45,6 +45,9 @@ public class UrlMappingService {
             throw new RuntimeException("This short link has expired.");
         }
 
+        mapping.incrementClickCount();
+        repository.save(mapping);
+
         return mapping.getOriginalUrl();
     }
 
@@ -53,5 +56,11 @@ public class UrlMappingService {
         return Base64.getUrlEncoder()
                 .encodeToString(raw.getBytes())
                 .substring(0, 8); // shorten to 8 chars
+    }
+
+    public int getClickCount(String shortUrl) {
+        return repository.findByShortUrl(shortUrl)
+                .map(UrlMapping::getClickCount)
+                .orElse(0);
     }
 }
