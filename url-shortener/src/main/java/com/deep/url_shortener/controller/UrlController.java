@@ -2,11 +2,9 @@ package com.deep.url_shortener.controller;
 
 import com.deep.url_shortener.service.UrlMappingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/api/url")
@@ -27,13 +25,13 @@ public class UrlController {
     @GetMapping("/{shortUrl}")
     public ResponseEntity<Void> redirect(@PathVariable String shortUrl) {
         String originalUrl = service.getOriginalUrl(shortUrl);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(originalUrl))
-                .build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", originalUrl);
+        return ResponseEntity.status(302).headers(headers).build();
     }
 
     @GetMapping("/{shortUrl}/stats")
-    public int getClickStats(@PathVariable String shortUrl) {
-        return service.getClickCount(shortUrl);
+    public ResponseEntity<Integer> getClickStats(@PathVariable String shortUrl) {
+        return ResponseEntity.ok(service.getClickCount(shortUrl));
     }
 }

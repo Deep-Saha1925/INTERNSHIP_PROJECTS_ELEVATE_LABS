@@ -28,15 +28,15 @@ public class UrlMapping {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public UrlMapping(Long id, String shortUrl, String originalUrl, LocalDateTime expiryDate, LocalDateTime createdAt) {
+    public UrlMapping(Long id, String shortUrl, String originalUrl, LocalDateTime expiryDate) {
         this.id = id;
         this.shortUrl = shortUrl;
         this.originalUrl = originalUrl;
         this.expiryDate = expiryDate;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
     }
 
-    public void incrementClickCount(){
+    public void incrementClickCount() {
         this.clickCount++;
     }
 }

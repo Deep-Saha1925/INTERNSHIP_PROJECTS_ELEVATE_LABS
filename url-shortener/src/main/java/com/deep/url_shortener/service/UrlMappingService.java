@@ -18,13 +18,11 @@ public class UrlMappingService {
     public String shortenUrl(String originalUrl, String customCode, Integer expiryMinutes) {
         String shortCode;
         if (customCode != null && !customCode.isEmpty()) {
-            // user-provided
             if (repository.findByShortUrl(customCode).isPresent()) {
                 throw new RuntimeException("Custom code already exists. Try another one.");
             }
             shortCode = customCode;
         } else {
-            // auto-generate
             shortCode = generateShortCode(originalUrl);
         }
 
@@ -32,8 +30,9 @@ public class UrlMappingService {
                 ? LocalDateTime.now().plusMinutes(expiryMinutes)
                 : null;
 
-        UrlMapping mapping = new UrlMapping(null, shortCode, originalUrl, LocalDateTime.now(), expiryDate);
+        UrlMapping mapping = new UrlMapping(null, shortCode, originalUrl, expiryDate);
         repository.save(mapping);
+
         return shortCode;
     }
 
@@ -42,6 +41,7 @@ public class UrlMappingService {
                 .orElseThrow(() -> new RuntimeException("URL not found"));
 
         if (mapping.getExpiryDate() != null && LocalDateTime.now().isAfter(mapping.getExpiryDate())) {
+            repository.delete(mapping);
             throw new RuntimeException("This short link has expired.");
         }
 
@@ -55,7 +55,7 @@ public class UrlMappingService {
         String raw = url.hashCode() + "_" + System.nanoTime();
         return Base64.getUrlEncoder()
                 .encodeToString(raw.getBytes())
-                .substring(0, 8); // shorten to 8 chars
+                .substring(0, 8);
     }
 
     public int getClickCount(String shortUrl) {
