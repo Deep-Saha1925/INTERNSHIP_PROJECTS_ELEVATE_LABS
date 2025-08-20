@@ -22,5 +22,7 @@ public class UrlMapping {
     @Column(nullable = false)
     private String originalUrl;
 
+    private LocalDateTime expiryDate;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 }

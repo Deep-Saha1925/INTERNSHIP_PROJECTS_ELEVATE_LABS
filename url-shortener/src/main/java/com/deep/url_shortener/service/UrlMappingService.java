@@ -15,17 +15,37 @@ public class UrlMappingService {
         this.repository = repository;
     }
 
-    public String shortenUrl(String originalUrl) {
-        String shortCode = generateShortCode(originalUrl);
-        UrlMapping mapping = new UrlMapping(null, shortCode, originalUrl, LocalDateTime.now());
+    public String shortenUrl(String originalUrl, String customCode, Integer expiryMinutes) {
+        String shortCode;
+        if (customCode != null && !customCode.isEmpty()) {
+            // user-provided
+            if (repository.findByShortUrl(customCode).isPresent()) {
+                throw new RuntimeException("Custom code already exists. Try another one.");
+            }
+            shortCode = customCode;
+        } else {
+            // auto-generate
+            shortCode = generateShortCode(originalUrl);
+        }
+
+        LocalDateTime expiryDate = expiryMinutes != null
+                ? LocalDateTime.now().plusMinutes(expiryMinutes)
+                : null;
+
+        UrlMapping mapping = new UrlMapping(null, shortCode, originalUrl, LocalDateTime.now(), expiryDate);
         repository.save(mapping);
         return shortCode;
     }
 
     public String getOriginalUrl(String shortUrl) {
-        return repository.findByShortUrl(shortUrl)
-                .map(UrlMapping::getOriginalUrl)
+        UrlMapping mapping = repository.findByShortUrl(shortUrl)
                 .orElseThrow(() -> new RuntimeException("URL not found"));
+
+        if (mapping.getExpiryDate() != null && LocalDateTime.now().isAfter(mapping.getExpiryDate())) {
+            throw new RuntimeException("This short link has expired.");
+        }
+
+        return mapping.getOriginalUrl();
     }
 
     private String generateShortCode(String url) {
