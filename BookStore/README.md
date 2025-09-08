@@ -91,14 +91,6 @@ Here you can:
 
 ---
 
-## 📷 Swagger UI Screenshot
-
-Here’s how the API documentation looks via Swagger UI:
-
-![Swagger UI](assets/swagger_ui_1.png)
-![Swagger UI](assets/swagger_ui_2.png)
-![Swagger UI](assets/swagger_ui_3.png)
-
 ## 📜 License
 This project is licensed under the **Apache 2.0 License**.
 
